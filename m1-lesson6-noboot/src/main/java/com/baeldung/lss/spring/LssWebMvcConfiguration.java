@@ -9,9 +9,9 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import com.baeldung.lss.persistence.InMemoryUserRepository;
@@ -23,7 +23,7 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 @EnableWebMvc
 @Configuration
 @ComponentScan("com.baeldung.lss.web")
-public class LssWebMvcConfiguration extends WebMvcConfigurerAdapter {
+public class LssWebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -31,27 +31,27 @@ public class LssWebMvcConfiguration extends WebMvcConfigurerAdapter {
 
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
-    
+
     @Bean
     @Description("Thymeleaf Template Resolver")
     public ClassLoaderTemplateResolver templateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("templates/");     
-        templateResolver.setSuffix(".html");        
-        templateResolver.setTemplateMode("HTML5");
-     
+        templateResolver.setPrefix("templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML");
+
         return templateResolver;
     }
-     
+
     @Bean
     @Description("Thymeleaf Template Engine")
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.addDialect(new LayoutDialect());
-        templateEngine.setTemplateResolver(templateResolver());        
+        templateEngine.setTemplateResolver(templateResolver());
         return templateEngine;
     }
-    
+
     @Bean
     @Description("Thymeleaf View Resolver")
     public ThymeleafViewResolver viewResolver() {
@@ -61,13 +61,13 @@ public class LssWebMvcConfiguration extends WebMvcConfigurerAdapter {
         viewResolver.setCache(false);
         return viewResolver;
     }
-        
-    
+
+
     @Bean
     public UserRepository userRepository() {
         return new InMemoryUserRepository();
     }
-    
+
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new  Converter<String, User>() {
@@ -76,7 +76,7 @@ public class LssWebMvcConfiguration extends WebMvcConfigurerAdapter {
                 return userRepository().findUser(Long.valueOf(id));
             }
         });
-       
+
     }
 
 }
